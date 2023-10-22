@@ -1,6 +1,6 @@
 import os
 import argparse
-from game import Game, GameType, Player, CoordPair,Options
+from game import Game, GameType, Player, CoordPair, Options
 # from evaluate import *
 # from generateStates import *
 # from datetime import datetime ############################
@@ -122,12 +122,6 @@ def main():
         print(game)
         generate_output_file(game.latest_move)
         winner = game.has_winner()
-        '''print("Heuristic score: " + str(evaluateScoreV2(game)))
-        nextStates = generateStates(game)
-        for state in nextStates:
-            print()
-            print(state)
-            print("Heuristic score for child state: " + str(evaluateScoreV2(state)) + '\n')'''
         if winner is not None:
             print(f"{winner.name} wins!")
             break

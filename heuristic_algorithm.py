@@ -1,11 +1,14 @@
-import time 
-from evaluate import evaluateScore0
+import time
+
+from enums import Player
+from evaluate import evaluateScore0, evaluateScoreV2
 from generateStates import generateStates
 
 def minimax(node, depth : int, max_player : bool, max_depth : int, time_limit : float, call_count, start_time):
     call_count[0] += 1
     if depth == max_depth or (time.perf_counter() - start_time) > time_limit:
-        return evaluateScore0(node)
+        return evaluateScoreV2(node)
+        #return evaluateScore0(node)
 
     if max_player:
         best_value = float('-inf')
@@ -57,7 +60,8 @@ def minimax_timer(initial_node, max_depth, time_limit):
 def alpha_beta(node, depth, alpha, beta, max_player, max_depth, time_limit, call_count, start_time):
     call_count[0] += 1
     if depth == max_depth or (time.perf_counter() - start_time) > time_limit:
-        return evaluateScore0(node)
+        return evaluateScoreV2(node)
+        #return evaluateScore0(node)
 
     if max_player:
         best_value = float('-inf')

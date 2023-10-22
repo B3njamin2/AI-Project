@@ -157,6 +157,7 @@ def healthTimesAttackRepairPointsScore(game, player: Player) -> int:
             curUnit = game.board[i][j]
             if curUnit is not None and curUnit.player == player:
                 if curUnit.type == UnitType.AI:
+                    #each constant here is the attack + repair points value of that given piece
                     score += 15 * curUnit.health
                 elif curUnit.type == UnitType.Virus:
                     score += 23 * curUnit.health
@@ -175,8 +176,7 @@ def evaluateScoreV2(game) -> int:
     elif hasDefenderWon(game):
         return -INFINITY
     else:
-        score = 0
-        score += healthTimesAttackRepairPointsScore(game, Player.Attacker) - healthTimesAttackRepairPointsScore(game, Player.Defender)
+        score = healthTimesAttackRepairPointsScore(game, Player.Attacker) - healthTimesAttackRepairPointsScore(game, Player.Defender)
         return score
 
 '''

@@ -352,7 +352,10 @@ class Game:
     def suggest_move(self) -> CoordPair | None:
         """Suggest the next move using minimax alpha beta. TODO: REPLACE RANDOM_MOVE WITH PROPER GAME LOGIC!!!"""
         start_time = datetime.now()
-        (score, move) = minimax_timer(self, self.options.max_depth, self.options.max_time )
+        if self.options.alpha_beta:
+            (score, move) = alpha_beta_timer(self, self.options.max_depth, self.options.max_time)
+        else:
+            (score, move) = minimax_timer(self, self.options.max_depth, self.options.max_time)
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
