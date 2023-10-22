@@ -2,21 +2,21 @@ import time
 from evaluate import evaluateScore0
 from generateStates import generateStates
 
-def minimax(node, depth : int, max_player : bool, max_depth : int, time_limit : float, call_count=[0]):
+def minimax(node, depth : int, max_player : bool, max_depth : int, time_limit : float, call_count, start_time):
     call_count[0] += 1
-    if depth == max_depth or time.time() > time_limit:
+    if depth == max_depth or (time.perf_counter() - start_time) > time_limit:
         return evaluateScore0(node)
 
     if max_player:
         best_value = float('-inf')
         for child in generateStates(node):
-            value = minimax(child, depth + 1, False,  max_depth, time_limit, call_count)
+            value = minimax(child, depth + 1, False,  max_depth, time_limit, call_count, start_time)
             best_value = max(best_value, value)
         return best_value
     else:
         best_value = float('inf')
         for child in generateStates(node):
-            value = minimax(child, depth + 1, True,  max_depth, time_limit, call_count)
+            value = minimax(child, depth + 1, True,  max_depth, time_limit, call_count, start_time)
             best_value = min(best_value, value)
         return best_value
 
@@ -38,7 +38,7 @@ def minimax_alphbeta_timer(initial_node, max_depth, time_limit):
         print(time.perf_counter() - start_time)
         print(call_count)
         for child in generateStates(initial_node):
-            value = minimax(child, 1, not max_player, depth, time_limit, call_count)
+            value = minimax(child, 1, not max_player, depth, time_limit, call_count, start_time)
             
             if (time.perf_counter() - start_time) > time_limit:
                 time_limit_reached = True
