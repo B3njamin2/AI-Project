@@ -10,7 +10,7 @@ def main():
     # parse command line arguments
     parser = argparse.ArgumentParser( prog='ai_wargame', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--max_depth', type=int, default="100", help='maximum search depth')
-    parser.add_argument('--max_time', type=float, default="1", help='maximum search time')
+    parser.add_argument('--max_time', type=float, default="10", help='maximum search time')
     parser.add_argument('--game_type', type=str, default="defender", help='game type: auto|attacker|defender|manual')
     parser.add_argument('--broker', type=str, help='play via a game broker')
     
