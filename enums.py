@@ -26,3 +26,8 @@ class GameType(Enum):
     AttackerVsComp = 1
     CompVsDefender = 2
     CompVsComp = 3
+
+class Heuristics(Enum):
+    e0 = 0
+    e1 = 1
+    e2 = 3

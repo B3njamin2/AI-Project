@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
-from enums import GameType
+from enums import GameType, Heuristics
 
 @dataclass(slots=True)
 class Options:
@@ -15,3 +15,4 @@ class Options:
     max_turns : int | None = 100
     randomize_moves : bool = True
     broker : str | None = None
+    heuristic : int | None = Heuristics.e0

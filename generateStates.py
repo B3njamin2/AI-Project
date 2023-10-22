@@ -39,4 +39,9 @@ def generateStates(game):
                             else:
                                 nextState.next_turn()
                                 nextStates.append(nextState)
+                selfDestructState = game.clone()
+                (success, result) = selfDestructState.perform_move(CoordPair(srcCoord, srcCoord))
+                if success:
+                    selfDestructState.next_turn()
+                    nextStates.append(selfDestructState)                
     return nextStates

@@ -1,6 +1,6 @@
 import os
 import argparse
-from game import Game, GameType, Player, CoordPair, Options
+from game import Game, GameType, Player, CoordPair, Options, Heuristics
 # from evaluate import *
 # from generateStates import *
 # from datetime import datetime ############################
@@ -9,18 +9,18 @@ def main():
     #Command line example:  python main.py --max_depth 2 --max_time 5 --max_turns 20 --game_type auto
     # parse command line arguments
     parser = argparse.ArgumentParser( prog='ai_wargame', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--max_depth', type=int, default="100", help='maximum search depth')
-    parser.add_argument('--max_time', type=float, default="10", help='maximum search time')
-    parser.add_argument('--game_type', type=str, default="defender", help='game type: auto|attacker|defender|manual')
+    parser.add_argument('--max_depth', type=int, help='maximum search depth')
+    parser.add_argument('--max_time', type=float, help='maximum search time')
+    parser.add_argument('--game_type', type=str, default="manual", help='game type: auto|attacker|defender|manual')
     parser.add_argument('--broker', type=str, help='play via a game broker')
     
     # The maximum number of turns to declare the end of the game 
     parser.add_argument('--max_turns', type=int, help='number of turns before game ends') 
     parser.add_argument('--alpha_beta', type=bool, help='A Boolean to force the use of either minimax (FALSE) or alpha-beta (TRUE)')
+    parser.add_argument('--heuristics', type=str, help='e0, e1, e2')
     
     args = parser.parse_args()
 
-    
     # parse the game type
     if args.game_type == "attacker":
         game_type = GameType.AttackerVsComp
@@ -48,13 +48,25 @@ def main():
     if args.alpha_beta is not None:
         options.alpha_beta = args.alpha_beta
 
+    heuristic_name = "E0"
+    if  options.heuristic == "e0":
+        options.heuristic = Heuristics.e0
+        heuristic_name = "E0"
+    elif args.heuristics == "e1":
+        options.heuristic = Heuristics.e1
+        heuristic_name = "E1"
+    elif args.heuristics == "e2":
+        options.heuristic = Heuristics.e2
+        heuristic_name = "E2"
+   
+
     # create a new game
     game = Game(options=options)
 
     
     # Function to generate output file
     filename = f"gameTrace-{options.alpha_beta}-{options.max_time}-{options.max_turns}.txt"
-    heuristic_name = "E0" ########################### Changeable 
+     ########################### Changeable 
     
     def make_unique_filename(filename):
             base, ext = os.path.splitext(filename)
@@ -83,7 +95,7 @@ def main():
                                 file.write("Player 1 is H & Player 2 is AI\n")
                             else:
                                 file.write("Player 1 is AI & Player 2 is AI\n")
-                            file.write(f"The heuristic name is: {heuristic_name}")############### Heuristic name TBD
+                            file.write(f"The heuristic name is: {heuristic_name} \n")############### Heuristic name TBD
                         else:
                             file.write("Player 1 is H & Player 2 is H\n\n")
                 file.write(f"{game}\n")

@@ -177,7 +177,7 @@ def evaluateScoreV2(game) -> int:
         return -INFINITY
     else:
         score = healthTimesAttackRepairPointsScore(game, Player.Attacker) - healthTimesAttackRepairPointsScore(game, Player.Defender)
-        return score
+        return score 
 
 '''
 e0 in assignment description
@@ -209,4 +209,4 @@ def evaluateScore0(game) -> int:
                     score -= 3
                 elif curUnit.type == UnitType.Program:
                     score -= 3
-    return score
+    return score 

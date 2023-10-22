@@ -11,6 +11,7 @@ from coord import *
 from stats import Stats
 from options import Options
 from heuristic_algorithm import minimax_timer, alpha_beta_timer
+from evaluate import evaluateScore0, evaluateScoreV2
 
 
 
@@ -351,11 +352,22 @@ class Game:
 
     def suggest_move(self) -> CoordPair | None:
         """Suggest the next move using minimax alpha beta. TODO: REPLACE RANDOM_MOVE WITH PROPER GAME LOGIC!!!"""
+        is_maximizing_player = self.next_player == Player.Attacker
+        max_depth = self.options.max_depth
+        max_time = self.options.max_time
+
+        evalfunc = None
+
+        if self.options.heuristic == Heuristics.e0:
+            evalfunc = evaluateScore0
+        if self.options.heuristic == Heuristics.e2:
+            evalfunc = evaluateScoreV2
+
         start_time = datetime.now()
         if self.options.alpha_beta:
-            (score, move) = alpha_beta_timer(self, self.options.max_depth, self.options.max_time)
+            (score, move) = alpha_beta_timer(self, is_maximizing_player, evalfunc, max_depth, max_time)
         else:
-            (score, move) = minimax_timer(self, self.options.max_depth, self.options.max_time)
+            (score, move) = minimax_timer(self, is_maximizing_player, evalfunc, max_depth, max_time )
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
