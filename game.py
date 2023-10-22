@@ -10,6 +10,7 @@ from unit import Unit
 from coord import *
 from stats import Stats
 from options import Options
+from heuristic_algorithm import minimax_alphbeta_timer
 
 
 
@@ -23,6 +24,7 @@ class Game:
     stats: Stats = field(default_factory=Stats)
     _attacker_has_ai : bool = True
     _defender_has_ai : bool = True
+    latest_move: CoordPair = None
 
     def __post_init__(self):
         """Automatically called after class init to set up the default board state."""
@@ -148,7 +150,7 @@ class Game:
 
         self.set(coords.dst, self.get(coords.src))
         self.set(coords.src, None)
-
+        self.latest_move = coords
         return (True, "Movement successful\n")
 
     def perform_attack(self, coords: CoordPair) -> Tuple[bool, str]:
@@ -158,6 +160,7 @@ class Game:
         dst_damage_taken = srcUnit.damage_amount(dstUnit)
         self.mod_health(coords.src, -src_damage_taken)
         self.mod_health(coords.dst, -dst_damage_taken)
+        self.latest_move = coords
         return (True, f"{src_damage_taken} damage taken and {dst_damage_taken} damage done")
 
     def perform_repair(self, coords: CoordPair) -> Tuple[bool, str]:
@@ -168,6 +171,7 @@ class Game:
             return (False, "Invalid move: Unit cannot repair or repair leads to no change.\n")
         
         self.mod_health(coords.dst, added_value)
+        self.latest_move = coords
         return (True, f"Repaired {added_value} heath point(s)\n")
         
 
@@ -188,7 +192,7 @@ class Game:
             self.mod_health(currentCord, -2)
 
         self.mod_health(coords.src, -9)
-
+        self.latest_move = coords
         return (True, f"{coords.src} self destructed")
 
     def perform_move(self, coords: CoordPair) -> Tuple[bool, str]:
@@ -283,7 +287,8 @@ class Game:
                     break
                 else:
                     print(result + " Try again.")
-        return mv
+        self.latest_move = mv
+        return
     def computer_turn(self) -> CoordPair | None:
         """Computer plays a move."""
         mv = self.suggest_move()
@@ -293,8 +298,9 @@ class Game:
                 print(f"Computer {self.next_player.name}: ",end='')
                 print(result)
                 self.next_turn()
-            else: # Print something if mv is an illegal move
+            else: # Print something if mv is an illegal move we need to throw error 
                 print("\nInvalid move. Try again!!!")
+        self.latest_move = mv
         return mv
 
     def player_units(self, player: Player) -> Iterable[Tuple[Coord,Unit]]:
@@ -312,13 +318,12 @@ class Game:
         """Check if the game is over and returns winner"""
         if self.options.max_turns is not None and self.turns_played >= self.options.max_turns:
             return Player.Defender
-        elif self._attacker_has_ai:
+        if self._attacker_has_ai:
             if self._defender_has_ai:
                 return None
             else:
                 return Player.Attacker    
-        elif self._defender_has_ai:
-            return Player.Defender
+        return Player.Defender
 
     def move_candidates(self) -> Iterable[CoordPair]:
         """Generate valid move candidates for the next player."""
@@ -327,28 +332,30 @@ class Game:
             move.src = src
             for dst in src.iter_adjacent():
                 move.dst = dst
-                if self.is_valid_move(move):
+                clone = self.clone()
+                valid, temp = clone.perform_move(move)
+                if valid:
                     yield move.clone()
             move.dst = src
             yield move.clone()
 
-    def random_move(self) -> Tuple[int, CoordPair | None, float]:
+    def random_move(self) -> Tuple[int, CoordPair | None]:
         """Returns a random move."""
         move_candidates = list(self.move_candidates())
         random.shuffle(move_candidates)
         if len(move_candidates) > 0:
-            return (0, move_candidates[0], 1)
+            return (0, move_candidates[0])
         else:
-            return (0, None, 0)
+            return (0, None)
+        
 
     def suggest_move(self) -> CoordPair | None:
         """Suggest the next move using minimax alpha beta. TODO: REPLACE RANDOM_MOVE WITH PROPER GAME LOGIC!!!"""
         start_time = datetime.now()
-        (score, move, avg_depth) = self.random_move()
+        (score, move) = minimax_alphbeta_timer(self, self.options.max_depth, self.options.max_time )
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
-        print(f"Average recursive depth: {avg_depth:0.1f}")
         print(f"Evals per depth: ",end='')
         for k in sorted(self.stats.evaluations_per_depth.keys()):
             print(f"{k}:{self.stats.evaluations_per_depth[k]} ",end='')
@@ -408,3 +415,4 @@ class Game:
         except Exception as error:
             print(f"Broker error: {error}")
         return None
+    

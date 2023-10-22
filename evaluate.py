@@ -1,23 +1,22 @@
 from unit import Unit
-from game import Game
 from coord import *
 from enums import *
 
 INFINITY = 99999999
 
-def hasAttackerWon(game: Game) -> bool:
+def hasAttackerWon(game) -> bool:
     return game.has_winner() is not None and game.has_winner() == Player.Attacker
 
-def hasDefenderWon(game: Game) -> bool:
+def hasDefenderWon(game) -> bool:
     return game.has_winner() is not None and game.has_winner() == Player.Defender
 
-def inOpening(game: Game) -> bool:
+def inOpening(game) -> bool:
     return game.turns_played < (game.options.max_turns/3)
 
-def inEndgame(game: Game) -> bool:
+def inEndgame(game) -> bool:
     return game.turns_played > (3*(game.options.max_turns/4))
 
-def basicEvaluateForAttacker(game: Game, attackerPiecesTogetherMultiplier: int) -> int:
+def basicEvaluateForAttacker(game, attackerPiecesTogetherMultiplier: int) -> int:
     score = 0
     enemyAICoord = getDefenderAICoord(game)
 
@@ -39,7 +38,7 @@ def basicEvaluateForAttacker(game: Game, attackerPiecesTogetherMultiplier: int) 
                     score += 20 * curUnit.health
     return score
 
-def getDefenderAICoord(game: Game) -> Coord:
+def getDefenderAICoord(game) -> Coord:
     for i in range(len(game.board)):
         for j in range(len(game.board[i])):
             curUnit = game.board[i][j]
@@ -47,13 +46,13 @@ def getDefenderAICoord(game: Game) -> Coord:
                 return Coord(i,j)
 
 #encourage AI to move attacker's pieces towards the defender's AI
-def moveAttackingPiecesTowardsEnemyAIScore(game: Game, row: int, col: int, enemyAICoord: Coord) -> int:
+def moveAttackingPiecesTowardsEnemyAIScore(game, row: int, col: int, enemyAICoord: Coord) -> int:
     curUnit = game.board[row][col]
     multiplier = -5
     return multiplier * (row + col)
 
 #encourage AI to keep attacking pieces together
-def attackerPiecesTogetherScore(game: Game, i: int, j: int, multiplier: int) -> int:
+def attackerPiecesTogetherScore(game, i: int, j: int, multiplier: int) -> int:
     score = 0
     curUnit = game.board[i][j]
     srcCoord = Coord(i, j)
@@ -71,7 +70,7 @@ def attackerPiecesTogetherScore(game: Game, i: int, j: int, multiplier: int) -> 
                     score += 2
     return multiplier * score
 
-def basicEvaluateForDefender(game: Game) -> int:
+def basicEvaluateForDefender(game) -> int:
     score = 0
     for i in range(len(game.board)):
         for j in range(len(game.board[i])):
@@ -90,12 +89,12 @@ def basicEvaluateForDefender(game: Game) -> int:
                     score += 20 * curUnit.health
     return score
 
-def closeToFinishScore(game: Game) -> int:
+def closeToFinishScore(game) -> int:
     return game.turns_played - (3*(game.options.max_turns/4))
 
 
 #encourage AI to keep num of adjacent coords as small as possible & num of defender pieces in adjacent coords as high as possible (specifically for ai) & pieces together (specifically tech & program)
-def defenderPieceFlanksCoveredScore(game: Game, i: int, j: int) -> int:
+def defenderPieceFlanksCoveredScore(game, i: int, j: int) -> int:
     score = 0
     curUnit = game.board[i][j]
     srcCoord = Coord(i, j)
@@ -122,7 +121,7 @@ def defenderPieceFlanksCoveredScore(game: Game, i: int, j: int) -> int:
     return score
 
 
-def evaluateForAttacker(game: Game) -> int:
+def evaluateForAttacker(game) -> int:
     score = 0
     # TODO: test multiplier in func below with mult below to ensure that attacking pieces are encouraged to move towards ai instead of staying together
     attackerPiecesTogetherMultiplier = 0
@@ -134,14 +133,14 @@ def evaluateForAttacker(game: Game) -> int:
     return score
 
 
-def evaluateForDefender(game: Game) -> int:
+def evaluateForDefender(game) -> int:
     score = 0
     score += basicEvaluateForDefender(game)
     if inEndgame(game):
         score += closeToFinishScore(game)
     return score
 
-def evaluateScore(game: Game) -> int:
+def evaluateScore(game) -> int:
     if hasAttackerWon(game):
         return INFINITY
     elif hasDefenderWon(game):
@@ -151,7 +150,7 @@ def evaluateScore(game: Game) -> int:
         return evaluateForAttacker(game) - evaluateForDefender(game)
 
 
-def healthTimesAttackRepairPointsScore(game: Game, player: Player) -> int:
+def healthTimesAttackRepairPointsScore(game, player: Player) -> int:
     score = 0
     for i in range(len(game.board)):
         for j in range(len(game.board[i])):
@@ -170,7 +169,7 @@ def healthTimesAttackRepairPointsScore(game: Game, player: Player) -> int:
     return score
 
 #more basic eval function that is simpler but allows minimax to go deeper
-def evaluateScoreV2(game: Game) -> int:
+def evaluateScoreV2(game) -> int:
     if hasAttackerWon(game):
         return INFINITY
     elif hasDefenderWon(game):
@@ -183,7 +182,7 @@ def evaluateScoreV2(game: Game) -> int:
 '''
 e0 in assignment description
 '''
-def evaluateScore0(game: Game) -> int:
+def evaluateScore0(game) -> int:
     score = 0
     for i in range(len(game.board)):
         for j in range(len(game.board[i])):

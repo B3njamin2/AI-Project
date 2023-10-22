@@ -1,5 +1,4 @@
 from enums import *
-from game import Game
 from coord import Coord, CoordPair
 
 def doMoreDamage(result: str) -> bool:
@@ -10,7 +9,7 @@ def doMoreDamage(result: str) -> bool:
     return damageDone > damageTaken
 
 
-def generateStates(game: Game) -> list[Game]:
+def generateStates(game):
     nextPlayer = game.next_player
     nextStates = []
 
@@ -30,11 +29,13 @@ def generateStates(game: Game) -> list[Game]:
                         if success:
                             #by default we know that viruses and techs are each player's most powerful pieces so insert that state in front
                             #if a move to a state does more damage to opponent than to itself insert that state in front
-                            if (len(nextStates) > 0 and (nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or (nextPlayer == Player.Defender and curUnit.type == UnitType.Tech) or doMoreDamage(result)):
-                                temp = nextStates[0]
-                                nextState.next_turn()
-                                nextStates[0] = nextState
-                                nextStates.append(temp)
+                            if (len(nextStates) > 0 and (nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or 
+                                (nextPlayer == Player.Defender and curUnit.type == UnitType.Tech) or doMoreDamage(result)):
+                                if (len(nextStates) > 0):
+                                    temp = nextStates[0]
+                                    nextState.next_turn()
+                                    nextStates[0] = nextState
+                                    nextStates.append(temp)
                             else:
                                 nextState.next_turn()
                                 nextStates.append(nextState)
