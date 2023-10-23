@@ -43,5 +43,7 @@ def generateStates(game):
                 (success, result) = selfDestructState.perform_move(CoordPair(srcCoord, srcCoord))
                 if success:
                     selfDestructState.next_turn()
-                    nextStates.append(selfDestructState)                
+                    nextStates.append(selfDestructState)  
+    game.stats.branching_factor[0] += 1 
+    game.stats.branching_factor[0] += len(nextStates)
     return nextStates

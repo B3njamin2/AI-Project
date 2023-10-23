@@ -16,7 +16,7 @@ def main():
     
     # The maximum number of turns to declare the end of the game 
     parser.add_argument('--max_turns', type=int, help='number of turns before game ends') 
-    parser.add_argument('--alpha_beta', type=bool, help='A Boolean to force the use of either minimax (FALSE) or alpha-beta (TRUE)')
+    parser.add_argument('--alpha_beta', type=bool, help='A Boolean to use either minimax (False) or alpha-beta (True)')
     parser.add_argument('--heuristics', type=str, help='e0, e1, e2')
     
     args = parser.parse_args()
@@ -79,60 +79,65 @@ def main():
     
     filename = make_unique_filename(filename)
     
-    def generate_output_file(coords: CoordPair = None):
+    def generate_output_file(game : Game, first=True):
         game_typ = str({game_type})
         with open(filename, 'a') as file:
-            try:
-                if os.path.exists(filename):
-                    if (os.path.getsize(filename)<= 0):
-                        file.write(f"Value of the timeout in seconds: {options.max_time}sec\n")
-                        file.write(f"The maximum number of turns: {options.max_turns}\n")
-                        if ('Comp' in game_typ):
-                            file.write(f"The alpha-beta is {options.alpha_beta}\n")
-                            if game_typ.find('Comp')< game_typ.find('r') and game_typ.find('r') != -1:
-                                file.write("Player 1 is AI & Player 2 is H\n")
-                            elif game_typ.find('Comp')> game_typ.find('r') and game_typ.find('r') != -1:
-                                file.write("Player 1 is H & Player 2 is AI\n")
-                            else:
-                                file.write("Player 1 is AI & Player 2 is AI\n")
-                            file.write(f"The heuristic name is: {heuristic_name} \n")############### Heuristic name TBD
+            if ('Comp' in game_typ): 
+                file.write(f"Heuristic score: {game.stats.heuristic_score:0.2f}")
+                total_evals = sum(game.stats.evaluations_per_depth.values())
+
+                file.write(f"\nCumulative evals: {total_evals}")
+                key_limit = None
+                for key, value in game.stats.evaluations_per_depth.items():
+                    if value == 0.00:
+                        key_limit = key
+                        break
+
+                file.write(f"\nEvals per depth: ")
+                for k in range(1,key_limit+1):
+                    file.write(f"{k}:{game.stats.evaluations_per_depth[k]} ")
+                
+                file.write(f"\nCumulative Evals per depth: ")
+                for k in range(1,key_limit+1):
+                    file.write(f"{k}:{game.stats.evaluations_per_depth[k]/total_evals:0.2f}% ")
+               
+                if game.stats.total_seconds > 0:
+                    file.write(f"\nEval perf.: {total_evals/game.stats.total_seconds/1000:0.1f}k/s")
+                file.write(f"\nElapsed time: {game.stats.total_seconds:0.1f}s")
+                file.write(f"\nAverage branching factor: {game.stats.branching_factor[0]/game.stats.branching_factor[0]:0.1f}\n")
+
+            if (game.latest_move is not None):
+                file.write(f"Action taken: {game.latest_move.src}-{game.latest_move.dst} \n\n\n")
+
+            file.write(f"{game}\n")
+
+            if game.has_winner() is not None:
+                file.write(f"\n\n\n{game.has_winner().name} wins in {game.turns_played} turns\n")
+            
+    def writeheader():
+        game_typ = str({game_type})
+        with open(filename, 'a') as file:
+            if os.path.exists(filename):
+                if (os.path.getsize(filename)<= 0):
+                    file.write(f"Value of the timeout in seconds: {options.max_time}sec\n")
+                    file.write(f"The maximum number of turns: {options.max_turns}\n")
+                    if ('Comp' in game_typ):
+                        file.write(f"The alpha-beta is {options.alpha_beta}\n")
+                        if game_typ.find('Comp')< game_typ.find('r') and game_typ.find('r') != -1:
+                            file.write("Player 1 is AI & Player 2 is H\n")
+                        elif game_typ.find('Comp')> game_typ.find('r') and game_typ.find('r') != -1:
+                            file.write("Player 1 is H & Player 2 is AI\n")
                         else:
-                            file.write("Player 1 is H & Player 2 is H\n\n")
-                file.write(f"{game}\n")
-                if (coords is not None):
-                    file.write(f"Action taken: {coords.src}-{coords.dst} \n\n\n")
-                # if ('Comp' in game_typ): 
-                #     total_evals = sum(game.stats.evaluations_per_depth.values())
-                #     start_time = datetime.now()
-                #     actionTaken = game.random_move() #### change for real heuristic function
-                #     elapsed_seconds = (datetime.now() - start_time).total_seconds()
-                    
-                #     file.write(f"Action taken/suggested by AI: {move}\n")
-                #     file.write(f"Time for this action: {elapsed_seconds:0.2f} sec\n") 
-                #     file.write(f"Heuristic score: {str(evaluateScore0(game))}\n") ################ 
-                #     file.write(f"Cummulative evals: {total_evals}\n") 
-                    
-                #     file.write(f"Cummulative evals by depth: ") 
-                #     for k in sorted(game.stats.evaluations_per_depth.keys()):
-                #         file.write(f"{k} = {game.stats.evaluations_per_depth[k]}, ")
-                #     file.write(f"\nCummulative % evals per depth: ")
-                #     for k in sorted(game.stats.evaluations_per_depth.keys()):
-                #         file.write(f"{k} = {game.stats.evaluations_per_depth[k]/total_evals*100}, ")
-                #     file.write("\n")
-                #     file.write(f"Average branching factor: {avgBranchingFactor:0.2f}\n")  ######### will fix later
-                #     file.write("\n")     
+                            file.write("Player 1 is AI & Player 2 is AI\n")
+                        file.write(f"The heuristic name is: {heuristic_name} \n")############### Heuristic name TBD
+                    else:
+                        file.write("Player 1 is H & Player 2 is H\n")
+            file.write(f"\n{game}\n")
 
-                if game.has_winner() is not None:
-                    file.write(f"\n\n\n{game.has_winner().name} wins in {game.turns_played} turns\n")
-            except Exception as e:
-                print(e)
-
-    # the main game loop
-    numBranching =0
+    writeheader()
     while True:
-        print()
         print(game)
-        generate_output_file(game.latest_move)
+        
         winner = game.has_winner()
         if winner is not None:
             print(f"{winner.name} wins!")
@@ -144,13 +149,14 @@ def main():
         elif game.options.game_type == GameType.CompVsDefender and game.next_player == Player.Defender:
             game.human_turn()
         else:
-            player = game.next_player
+            #player = game.next_player
             move = game.computer_turn()            
             if move is not None:
                 game.post_move_to_broker(move)
             else:
                 print("Computer doesn't know what to do!!!")
-                exit(1)        
+                exit(1)  
+        generate_output_file(game)      
         # if player != game.next_player:
         #     numBranching += len(generateStates(game)) #Total number of states visited for each turn played
         # if game.turns_played == 0: #Check if it is not the root 
