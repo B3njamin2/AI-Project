@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import copy
 from dataclasses import dataclass, field
 from typing import Tuple
 import random
@@ -25,8 +27,8 @@ class Game:
     _attacker_has_ai : bool = True
     _defender_has_ai : bool = True
     latest_move: CoordPair = None
-    '''attacker_pieces_locations: list[Coord] = None
-    defender_pieces_locations: list[Coord] = None'''
+    attacker_pieces_locations: list[Coord] = None
+    defender_pieces_locations: list[Coord] = None
 
     def __post_init__(self):
         """Automatically called after class init to set up the default board state."""
@@ -46,7 +48,7 @@ class Game:
         self.set(Coord(md,md-2),Unit(player=Player.Attacker,type=UnitType.Program))
         self.set(Coord(md-1,md-1),Unit(player=Player.Attacker,type=UnitType.Firewall))
 
-        '''self.defender_pieces_locations = []
+        self.defender_pieces_locations = []
         self.attacker_pieces_locations = []
 
         self.defender_pieces_locations.append(Coord(0, 0))
@@ -60,7 +62,7 @@ class Game:
         self.attacker_pieces_locations.append(Coord(md, md - 1))
         self.attacker_pieces_locations.append(Coord(md - 2, md))
         self.attacker_pieces_locations.append(Coord(md, md - 2))
-        self.attacker_pieces_locations.append(Coord(md - 1, md - 1))'''
+        self.attacker_pieces_locations.append(Coord(md - 1, md - 1))
 
     def clone(self) -> Game:
         """Make a new copy of a game for minimax recursion.
@@ -69,6 +71,8 @@ class Game:
         """
         new = copy.copy(self)
         new.board = copy.deepcopy(self.board)
+        new.attacker_pieces_locations = copy.deepcopy(self.attacker_pieces_locations)
+        new.defender_pieces_locations = copy.deepcopy(self.defender_pieces_locations)
         return new
 
     def is_empty(self, coord : Coord) -> bool:
@@ -92,12 +96,12 @@ class Game:
         unit = self.get(coord)
         if unit is not None and not unit.is_alive():
             self.set(coord,None)
-            '''for location in self.attacker_pieces_locations:
+            for location in self.attacker_pieces_locations:
                 if location == coord:
                     self.attacker_pieces_locations.remove(location)
             for location in self.defender_pieces_locations:
                 if location == coord:
-                    self.defender_pieces_locations.remove(location)'''
+                    self.defender_pieces_locations.remove(location)
             if unit.type == UnitType.AI:
                 if unit.player == Player.Attacker:
                     self._attacker_has_ai = False
@@ -174,14 +178,14 @@ class Game:
 
         self.set(coords.dst, self.get(coords.src))
         self.set(coords.src, None)
-        '''if self.next_player == Player.Attacker:
+        if self.get(coords.dst).player == Player.Attacker:
             for index in range(len(self.attacker_pieces_locations)):
                 if self.attacker_pieces_locations[index] == coords.src:
                     self.attacker_pieces_locations[index] = coords.dst
         else:
             for index in range(len(self.defender_pieces_locations)):
                 if self.defender_pieces_locations[index] == coords.src:
-                    self.defender_pieces_locations[index] = coords.dst'''
+                    self.defender_pieces_locations[index] = coords.dst
 
         self.latest_move = coords
         return (True, "Movement successful\n")

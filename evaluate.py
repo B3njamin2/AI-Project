@@ -184,7 +184,33 @@ e0 in assignment description
 '''
 def evaluateScore0(game) -> int:
     score = 0
-    for i in range(len(game.board)):
+
+    for coord in game.attacker_pieces_locations:
+        curUnit = game.board[coord.row][coord.col]
+        if curUnit.type == UnitType.AI:
+            score += 9999
+        elif curUnit.type == UnitType.Virus:
+            score += 3
+        elif curUnit.type == UnitType.Tech:
+            score += 3
+        elif curUnit.type == UnitType.Firewall:
+            score += 3
+        elif curUnit.type == UnitType.Program:
+            score += 3
+    for coord in game.defender_pieces_locations:
+        curUnit = game.board[coord.row][coord.col]
+        if curUnit.type == UnitType.AI:
+            score -= 9999
+        elif curUnit.type == UnitType.Virus:
+            score -= 3
+        elif curUnit.type == UnitType.Tech:
+            score -= 3
+        elif curUnit.type == UnitType.Firewall:
+            score -= 3
+        elif curUnit.type == UnitType.Program:
+            score -= 3
+
+    '''for i in range(len(game.board)):
         for j in range(len(game.board[i])):
             curUnit = game.board[i][j]
             if curUnit is not None and curUnit.player == Player.Attacker:
@@ -208,5 +234,5 @@ def evaluateScore0(game) -> int:
                 elif curUnit.type == UnitType.Firewall:
                     score -= 3
                 elif curUnit.type == UnitType.Program:
-                    score -= 3
+                    score -= 3'''
     return score 

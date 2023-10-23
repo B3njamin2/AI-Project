@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import ClassVar, List
+
+from coord import Coord
 from enums import Player, UnitType
 
 @dataclass(slots=True)
