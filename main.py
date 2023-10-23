@@ -36,7 +36,11 @@ def main():
 
     # override class defaults via command line options
     if args.max_depth is not None:
-        options.max_depth = args.max_depth
+        #if max_depth is smaller than 1 it will throw an error (cant check backwards states obviously from the beginning of the game)
+        if args.max_depth < 1:
+            options.max_depth = 1
+        else:
+            options.max_depth = args.max_depth
     if args.max_time is not None:
         options.max_time = args.max_time
     if args.broker is not None:
