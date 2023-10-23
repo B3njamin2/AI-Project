@@ -29,7 +29,7 @@ def generateStates(game):
                         if success:
                             #by default we know that viruses and techs are each player's most powerful pieces so insert that state in front
                             #if a move to a state does more damage to opponent than to itself insert that state in front
-                            if (len(nextStates) > 0 and (nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or 
+                            if ((nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or 
                                 (nextPlayer == Player.Defender and curUnit.type == UnitType.Tech) or doMoreDamage(result)):
                                 if (len(nextStates) > 0):
                                     temp = nextStates[0]
