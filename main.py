@@ -104,7 +104,7 @@ def main():
                 if game.stats.total_seconds > 0:
                     file.write(f"\nEval perf.: {total_evals/game.stats.total_seconds/1000:0.1f}k/s")
                 file.write(f"\nElapsed time: {game.stats.total_seconds:0.1f}s")
-                file.write(f"\nAverage branching factor: {game.stats.branching_factor[0]/game.stats.branching_factor[0]:0.1f}\n")
+                file.write(f"\nAverage branching factor: {game.stats.branching_factor[1]/game.stats.branching_factor[0]:0.1f}\n")
 
             if (game.latest_move is not None):
                 file.write(f"Action taken: {game.latest_move.src}-{game.latest_move.dst} \n\n\n")

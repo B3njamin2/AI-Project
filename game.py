@@ -367,6 +367,8 @@ class Game:
         elif self.options.heuristic == Heuristics.e2:
             evalfunc = evaluateScoreV2
 
+        self.stats.branching_factor = [0,0]
+
         for i in range(1, max_depth + 1):
             self.stats.evaluations_per_depth[i] = 0
 
@@ -403,7 +405,7 @@ class Game:
         if self.stats.total_seconds > 0:
             print(f"Eval perf.: {total_evals/self.stats.total_seconds/1000:0.1f}k/s")
         print(f"Elapsed time: {elapsed_seconds:0.1f}s")
-        print(f"Average branching factor: {self.stats.branching_factor[0]/self.stats.branching_factor[0]:0.1f}")
+        print(f"Average branching factor: {self.stats.branching_factor[1]/self.stats.branching_factor[0]:0.1f}")
         return move
 
     def post_move_to_broker(self, move: CoordPair):

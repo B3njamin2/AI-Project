@@ -45,5 +45,5 @@ def generateStates(game):
                     selfDestructState.next_turn()
                     nextStates.append(selfDestructState)  
     game.stats.branching_factor[0] += 1 
-    game.stats.branching_factor[0] += len(nextStates)
+    game.stats.branching_factor[1] += len(nextStates)
     return nextStates
