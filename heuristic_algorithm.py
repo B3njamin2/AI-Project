@@ -1,9 +1,26 @@
 import time
-from enums import Player
+from enums import Player, Heuristics
 from generateStates import generateStates
 
 MAX_HEURISTIC_SCORE = 2000000000
 MIN_HEURISTIC_SCORE = -2000000000
+
+def get_minimum_depth(max_time : float, alpha_beta : bool, heuristic : Heuristics) -> int:
+    if max_time < 5:
+        return 1
+
+    min_depth = 4
+    if not alpha_beta:
+        min_depth -= 1
+    if heuristic == Heuristics.e1:
+        min_depth -= 1
+
+    return min_depth
+
+def get_time_limit(max_depth : int) -> float:
+    if max_depth > 40:
+        return 0.9
+    return (-0.002 * max_depth) + 0.98
 
 def minimax(node, depth : int, max_player : bool, eval_func , max_depth : int, start_time : float, time_limit : float, num_evals : list[int]):
     
@@ -27,9 +44,9 @@ def minimax(node, depth : int, max_player : bool, eval_func , max_depth : int, s
             best_value = min(best_value, value)
         return best_value
 
-def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_depth : int, time_limit : float):
+def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_depth : int, time_limit : float, min_depth : int):
     start_time = time.perf_counter()
-    time_limit *= 0.98 
+    time_limit *= get_time_limit(max_depth) #0.98
     time_limit_reached = False
     best_node = None
     best_value = None
@@ -37,7 +54,7 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
 
 
     if is_maximizing_player:
-        for depth in range(1, max_depth + 1):
+        for depth in range(min_depth, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('-inf')
             # print(depth)
@@ -62,7 +79,7 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
             else:
                 break
     else:
-        for depth in range(1, max_depth + 1):
+        for depth in range(min_depth, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('inf')
             # print(depth)
@@ -117,8 +134,8 @@ def alpha_beta(node, depth, alpha, beta, max_player, eval_func ,max_depth, start
                 break
         return best_value
 
-def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_depth, time_limit):
-    time_limit *= 0.95
+def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_depth, time_limit, min_depth):
+    time_limit *= get_time_limit(max_depth) #0.95
     start_time = time.perf_counter()
     time_limit_reached = False
     best_node = None
@@ -128,7 +145,7 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
     beta = float('inf')
 
     if is_maximizing_player:
-        for depth in range(1, max_depth + 1):
+        for depth in range(min_depth, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('-inf')
             # print(depth)
@@ -140,7 +157,7 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
                 if (time.perf_counter() - start_time) > time_limit:
                     time_limit_reached = True
                     break
-                
+
                 if value > current_best_value:
                     current_best_value = value
                     current_depth_best_move = child
@@ -154,7 +171,7 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
             else:
                 break
     else:
-        for depth in range(1, max_depth + 1):
+        for depth in range(min_depth, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('inf')
             checks = 0
@@ -167,11 +184,12 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
                 if (time.perf_counter() - start_time) > time_limit:
                     time_limit_reached = True
                     break
-                
+
                 if value < current_best_value:
                     current_best_value = value
                     current_depth_best_move = child
                     beta = min(beta, current_best_value)
+
 
             initial_node.stats.evaluations_per_depth[depth] = num_evals[0]
 

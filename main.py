@@ -16,7 +16,7 @@ def main():
     
     # The maximum number of turns to declare the end of the game 
     parser.add_argument('--max_turns', type=int, help='number of turns before game ends') 
-    parser.add_argument('--alpha_beta', type=bool, help='A Boolean to use either minimax (False) or alpha-beta (True)')
+    parser.add_argument('--alpha_beta', type=int, help='A Boolean to force the use of either minimax (0) or alpha-beta (1)')
     parser.add_argument('--heuristics', type=str, help='e0, e1, e2')
     
     args = parser.parse_args()
@@ -36,7 +36,11 @@ def main():
 
     # override class defaults via command line options
     if args.max_depth is not None:
-        options.max_depth = args.max_depth
+        #if max_depth is smaller than 1 it will throw an error (cant check backwards states obviously from the beginning of the game)
+        if args.max_depth < 1:
+            options.max_depth = 1
+        else:
+            options.max_depth = args.max_depth
     if args.max_time is not None:
         options.max_time = args.max_time
     if args.broker is not None:
@@ -46,7 +50,8 @@ def main():
     if args.max_turns is not None:
         options.max_turns = args.max_turns
     if args.alpha_beta is not None:
-        options.alpha_beta = args.alpha_beta
+        #was always setting it to true so changed it to int
+        options.alpha_beta = True if args.alpha_beta == 1 else False
 
     heuristic_name = "E0"
     if  options.heuristic == "e0":
