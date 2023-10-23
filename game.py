@@ -322,18 +322,20 @@ class Game:
                     print(result + " Try again.")
         self.latest_move = mv
         return
+    
     def computer_turn(self) -> CoordPair | None:
         """Computer plays a move."""
         mv = self.suggest_move()
         if mv is not None:
             (success,result) = self.perform_move(mv)
             if success:
+                print(f"Computer {self.next_player.name} action taken: {mv.src}-{mv.dst}")
                 print(f"Computer {self.next_player.name}: ",end='')
                 print(result)
                 self.next_turn()
             else: # Print something if mv is an illegal move we need to throw error 
-                print("\nInvalid move. Try again!!!")
-        self.latest_move = mv
+                print("\nComputer tried to play invalid move! Exiting ... \n")
+                exit(2)
         return mv
 
     def player_units(self, player: Player) -> Iterable[Tuple[Coord,Unit]]:
@@ -402,23 +404,45 @@ class Game:
         elif self.options.heuristic == Heuristics.e2:
             evalfunc = evaluateScoreV2
 
+        self.stats.branching_factor = [0,0]
+
+        for i in range(1, max_depth + 1):
+            self.stats.evaluations_per_depth[i] = 0
+
         start_time = datetime.now()
         if self.options.alpha_beta:
             (score, move) = alpha_beta_timer(self, is_maximizing_player, evalfunc, max_depth, max_time, min_depth)
         else:
             (score, move) = minimax_timer(self, is_maximizing_player, evalfunc, max_depth, max_time, min_depth)
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
-        self.stats.total_seconds += elapsed_seconds
-        print(f"Heuristic score: {score}")
-        print(f"Evals per depth: ",end='')
-        for k in sorted(self.stats.evaluations_per_depth.keys()):
-            print(f"{k}:{self.stats.evaluations_per_depth[k]} ",end='')
-        print()
+
+        self.stats.total_seconds = elapsed_seconds
+        self.stats.heuristic_score = score
+
+        print(f"Heuristic score: {score:0.2f}")
         total_evals = sum(self.stats.evaluations_per_depth.values())
+
+        print(f"Cumulative evals: {total_evals}")
+        key_limit = None
+        for key, value in self.stats.evaluations_per_depth.items():
+            if value == 0.00:
+                key_limit = key
+                break
+
+        print(f"Evals per depth: ",end='')
+        for k in range(1,key_limit+1):
+            print(f"{k}:{self.stats.evaluations_per_depth[k]}",end=' ')
+        print()
+        
+        print(f"Cumulative Evals per depth: ",end='')
+        for k in range(1,key_limit+1):
+            print(f"{k}:{self.stats.evaluations_per_depth[k]/total_evals:0.2f}%",end=' ')
+        print()
+
         if self.stats.total_seconds > 0:
             print(f"Eval perf.: {total_evals/self.stats.total_seconds/1000:0.1f}k/s")
         print(f"Elapsed time: {elapsed_seconds:0.1f}s")
-        print("\n")
+        print(f"Average branching factor: {self.stats.branching_factor[1]/self.stats.branching_factor[0]:0.1f}")
         return move
 
     def post_move_to_broker(self, move: CoordPair):
@@ -469,4 +493,3 @@ class Game:
         except Exception as error:
             print(f"Broker error: {error}")
         return None
-    

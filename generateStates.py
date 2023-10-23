@@ -29,7 +29,7 @@ def generateStates(game):
                         if success:
                             #by default we know that viruses and techs are each player's most powerful pieces so insert that state in front
                             #if a move to a state does more damage to opponent than to itself insert that state in front
-                            if (len(nextStates) > 0 and (nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or 
+                            if ((nextPlayer == Player.Attacker and curUnit.type == UnitType.Virus) or 
                                 (nextPlayer == Player.Defender and curUnit.type == UnitType.Tech) or doMoreDamage(result)):
                                 if (len(nextStates) > 0):
                                     temp = nextStates[0]
@@ -43,5 +43,7 @@ def generateStates(game):
                 (success, result) = selfDestructState.perform_move(CoordPair(srcCoord, srcCoord))
                 if success:
                     selfDestructState.next_turn()
-                    nextStates.append(selfDestructState)                
+                    nextStates.append(selfDestructState)  
+    game.stats.branching_factor[0] += 1 
+    game.stats.branching_factor[1] += len(nextStates)
     return nextStates
