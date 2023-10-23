@@ -11,7 +11,6 @@ def minimax(node, depth : int, max_player : bool, eval_func , max_depth : int, s
     if (time.perf_counter() - start_time) > time_limit:
         return 0
     if depth == max_depth :
-        node.stats[depth] += 1
         return eval_func(node)
 
     if max_player:
