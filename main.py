@@ -85,7 +85,8 @@ def main():
     def generate_output_file(game : Game, first=True):
         game_typ = str({game_type})
         with open(filename, 'a') as file:
-            if ('Comp' in game_typ): 
+            if (game_type == GameType.CompVsComp or  ((game_type == GameType.CompVsDefender) and game.next_player == Player.Defender) 
+                or ((game_type == GameType.AttackerVsComp) and game.next_player == Player.Attacker)): 
                 file.write(f"Heuristic score: {game.stats.heuristic_score:0.2f}")
                 total_evals = sum(game.stats.evaluations_per_depth.values())
 
@@ -95,6 +96,8 @@ def main():
                     if value == 0.00:
                         key_limit = key
                         break
+                if key_limit is None:
+                    key_limit = len(game.stats.evaluations_per_depth)
 
                 file.write(f"\nEvals per depth: ")
                 for k in range(1,key_limit+1):

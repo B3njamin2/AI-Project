@@ -391,6 +391,8 @@ class Game:
             if value == 0.00:
                 key_limit = key
                 break
+        if key_limit is None:
+            key_limit = len(self.stats.evaluations_per_depth)
 
         print(f"Evals per depth: ",end='')
         for k in range(1,key_limit+1):
