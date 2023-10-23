@@ -10,9 +10,8 @@ from unit import Unit
 from coord import *
 from stats import Stats
 from options import Options
-from heuristic_algorithm import minimax_timer, alpha_beta_timer
-from evaluate import evaluateScore0, evaluateScoreV2
-
+from heuristic_algorithm import minimax_timer, alpha_beta_timer, get_minimum_depth
+from evaluate import evaluateScore0, evaluateScoreV2, evaluateScore
 
 
 @dataclass(slots=True)
@@ -26,6 +25,8 @@ class Game:
     _attacker_has_ai : bool = True
     _defender_has_ai : bool = True
     latest_move: CoordPair = None
+    '''attacker_pieces_locations: list[Coord] = None
+    defender_pieces_locations: list[Coord] = None'''
 
     def __post_init__(self):
         """Automatically called after class init to set up the default board state."""
@@ -44,6 +45,22 @@ class Game:
         self.set(Coord(md-2,md),Unit(player=Player.Attacker,type=UnitType.Program))
         self.set(Coord(md,md-2),Unit(player=Player.Attacker,type=UnitType.Program))
         self.set(Coord(md-1,md-1),Unit(player=Player.Attacker,type=UnitType.Firewall))
+
+        '''self.defender_pieces_locations = []
+        self.attacker_pieces_locations = []
+
+        self.defender_pieces_locations.append(Coord(0, 0))
+        self.defender_pieces_locations.append(Coord(1, 0))
+        self.defender_pieces_locations.append(Coord(0, 1))
+        self.defender_pieces_locations.append(Coord(2, 0))
+        self.defender_pieces_locations.append(Coord(0, 2))
+        self.defender_pieces_locations.append(Coord(1, 1))
+        self.attacker_pieces_locations.append(Coord(md, md))
+        self.attacker_pieces_locations.append(Coord(md - 1, md))
+        self.attacker_pieces_locations.append(Coord(md, md - 1))
+        self.attacker_pieces_locations.append(Coord(md - 2, md))
+        self.attacker_pieces_locations.append(Coord(md, md - 2))
+        self.attacker_pieces_locations.append(Coord(md - 1, md - 1))'''
 
     def clone(self) -> Game:
         """Make a new copy of a game for minimax recursion.
@@ -75,6 +92,12 @@ class Game:
         unit = self.get(coord)
         if unit is not None and not unit.is_alive():
             self.set(coord,None)
+            '''for location in self.attacker_pieces_locations:
+                if location == coord:
+                    self.attacker_pieces_locations.remove(location)
+            for location in self.defender_pieces_locations:
+                if location == coord:
+                    self.defender_pieces_locations.remove(location)'''
             if unit.type == UnitType.AI:
                 if unit.player == Player.Attacker:
                     self._attacker_has_ai = False
@@ -151,6 +174,15 @@ class Game:
 
         self.set(coords.dst, self.get(coords.src))
         self.set(coords.src, None)
+        '''if self.next_player == Player.Attacker:
+            for index in range(len(self.attacker_pieces_locations)):
+                if self.attacker_pieces_locations[index] == coords.src:
+                    self.attacker_pieces_locations[index] = coords.dst
+        else:
+            for index in range(len(self.defender_pieces_locations)):
+                if self.defender_pieces_locations[index] == coords.src:
+                    self.defender_pieces_locations[index] = coords.dst'''
+
         self.latest_move = coords
         return (True, "Movement successful\n")
 
@@ -358,16 +390,23 @@ class Game:
 
         evalfunc = None
 
+        min_depth = get_minimum_depth(max_time, self.options.alpha_beta, self.options.heuristic)
+        #check to see if min_depth is bigger than max_depth
+        if min_depth > max_depth:
+            min_depth = 1
+
         if self.options.heuristic == Heuristics.e0:
             evalfunc = evaluateScore0
-        if self.options.heuristic == Heuristics.e2:
+        elif self.options.heuristic == Heuristics.e1:
+            evalfunc = evaluateScore
+        elif self.options.heuristic == Heuristics.e2:
             evalfunc = evaluateScoreV2
 
         start_time = datetime.now()
         if self.options.alpha_beta:
-            (score, move) = alpha_beta_timer(self, is_maximizing_player, evalfunc, max_depth, max_time)
+            (score, move) = alpha_beta_timer(self, is_maximizing_player, evalfunc, max_depth, max_time, min_depth)
         else:
-            (score, move) = minimax_timer(self, is_maximizing_player, evalfunc, max_depth, max_time )
+            (score, move) = minimax_timer(self, is_maximizing_player, evalfunc, max_depth, max_time, min_depth)
         elapsed_seconds = (datetime.now() - start_time).total_seconds()
         self.stats.total_seconds += elapsed_seconds
         print(f"Heuristic score: {score}")
