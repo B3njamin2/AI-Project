@@ -16,7 +16,7 @@ def main():
     
     # The maximum number of turns to declare the end of the game 
     parser.add_argument('--max_turns', type=int, help='number of turns before game ends') 
-    parser.add_argument('--alpha_beta', type=bool, help='A Boolean to use either minimax (False) or alpha-beta (True)')
+    parser.add_argument('--alpha_beta', type=str, help='A Boolean to use either minimax (false) or alpha-beta (true)')
     parser.add_argument('--heuristics', type=str, help='e0, e1, e2')
     
     args = parser.parse_args()
@@ -45,8 +45,11 @@ def main():
     # override 
     if args.max_turns is not None:
         options.max_turns = args.max_turns
-    if args.alpha_beta is not None:
-        options.alpha_beta = args.alpha_beta
+        
+    if args.alpha_beta == "true":
+        options.alpha_beta = True
+    elif args.alpha_beta == "false":
+        options.alpha_beta = False
 
     heuristic_name = "E0"
     if  options.heuristic == "e0":

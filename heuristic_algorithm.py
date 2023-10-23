@@ -29,7 +29,7 @@ def minimax(node, depth : int, max_player : bool, eval_func , max_depth : int, s
 
 def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_depth : int, time_limit : float):
     start_time = time.perf_counter()
-    time_limit *= 0.98 
+    time_limit *= 0.95
     time_limit_reached = False
     best_node = None
     best_value = None
@@ -40,9 +40,6 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
         for depth in range(1, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('-inf')
-            # print(depth)
-            # print(time.perf_counter() - start_time)
-            # print(num_evals)
             for child in generateStates(initial_node):
                 value = minimax(child, 1, not is_maximizing_player, eval_func, depth, start_time, time_limit, num_evals)
                 
@@ -65,9 +62,6 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
         for depth in range(1, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('inf')
-            # print(depth)
-            # print(time.perf_counter() - start_time)
-            # print(num_evals)
             for child in generateStates(initial_node):
                 value = minimax(child, 1, not is_maximizing_player, eval_func, depth, start_time, time_limit, num_evals)
                 
@@ -131,9 +125,6 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
         for depth in range(1, max_depth + 1):
             current_depth_best_move = None
             current_best_value = float('-inf')
-            # print(depth)
-            # print(time.perf_counter() - start_time)
-            # print(num_evals)
             for child in generateStates(initial_node):
                 value = alpha_beta(child, 1, alpha, beta, not is_maximizing_player, eval_func, depth, start_time, time_limit, num_evals )
                 
@@ -158,9 +149,6 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
             current_depth_best_move = None
             current_best_value = float('inf')
             checks = 0
-            # print(depth)
-            # print(time.perf_counter() - start_time)
-            # print(num_evals)
             for child in generateStates(initial_node):
                 value = alpha_beta(child, 1, alpha, beta, not is_maximizing_player, eval_func, depth, start_time, time_limit, num_evals )
                 
