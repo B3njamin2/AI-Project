@@ -71,9 +71,6 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
             if not time_limit_reached:
                 best_node = current_depth_best_move
                 best_value = current_best_value
-                print('idek')
-                print(best_node)
-                print('\n')
             else:
                 break
     else:
@@ -97,9 +94,6 @@ def minimax_timer(initial_node, is_maximizing_player : bool, eval_func, max_dept
             if not time_limit_reached:
                 best_node = current_depth_best_move
                 best_value = current_best_value
-                print('idek')
-                print(best_node)
-                print('\n')
             else:
                 break
 
@@ -141,7 +135,6 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
 
     if is_maximizing_player:
         for depth in range(min_depth, max_depth + 1):
-            print('depth1: ' + str(depth))
             current_depth_best_move = None
             current_best_value = float('-inf')
             print(depth)
@@ -154,26 +147,18 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
                     time_limit_reached = True
                     break
 
-                print('value1: ' + str(value) + ' cbv: ' + str(current_best_value))
                 if value > current_best_value:
                     current_best_value = value
                     current_depth_best_move = child
                     alpha = max(alpha, current_best_value)
-                    print('im going in here\n')
             
             if not time_limit_reached:
                 best_node = current_depth_best_move
                 best_value = current_best_value
-                print('idek3')
-                print(current_depth_best_move)
-                print('idek4')
-                print(best_node)
-                print('\n')
             else:
                 break
     else:
         for depth in range(min_depth, max_depth + 1):
-            print('depth2: ' + str(depth))
             current_depth_best_move = None
             current_best_value = float('inf')
             checks = 0
@@ -187,22 +172,15 @@ def alpha_beta_timer(initial_node, is_maximizing_player : bool, eval_func, max_d
                     time_limit_reached = True
                     break
 
-                print('value2: ' + str(value) + ' cbv: ' +str(current_best_value))
                 if value < current_best_value:
                     current_best_value = value
                     current_depth_best_move = child
                     beta = min(beta, current_best_value)
-                    print('im going in here2\n')
 
         
             if not time_limit_reached:
                 best_node = current_depth_best_move
                 best_value = current_best_value
-                print('idek')
-                print(current_depth_best_move)
-                print('idek2')
-                print(best_node)
-                print('\n')
             else:
                 break
 
